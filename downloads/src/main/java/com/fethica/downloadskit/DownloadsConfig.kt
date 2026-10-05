@@ -35,7 +35,13 @@ import androidx.media3.datasource.HttpDataSource
  *   Null, the default, schedules nothing.
  * @param notificationContentIntent where tapping the progress notification goes.
  * @param foregroundNotificationId the id of the download service's foreground
- *   notification; change it only if it collides with one of the host's own.
+ *   notification; change it only if it collides with one of the host's own. Must not be
+ *   0: media3 reads 0 as "no foreground notification" and would then never promote the
+ *   service to the foreground, so constructing with 0 throws.
+ * @param serviceClass the download service every command is sent to. The default is the
+ *   library's own [MediaDownloadService], which its manifest already declares. A host that
+ *   declares its own subclass instead passes that subclass here, and removes the library's
+ *   manifest entry with `tools:node="remove"` so exactly one download service is declared.
  */
 public class DownloadsConfig(
     public val cacheDirName: String,
@@ -49,10 +55,14 @@ public class DownloadsConfig(
     public val schedulerJobId: Int? = null,
     public val notificationContentIntent: PendingIntent? = null,
     public val foregroundNotificationId: Int = MediaDownloadService.FOREGROUND_NOTIFICATION_ID,
+    public val serviceClass: Class<out MediaDownloadService> = MediaDownloadService::class.java,
 ) {
     init {
         require(settings != null || preferencesName != null) {
             "pass preferencesName for the built-in SharedPreferences store, or settings for your own"
+        }
+        require(foregroundNotificationId != 0) {
+            "foregroundNotificationId must not be 0: media3 treats 0 as no foreground notification"
         }
     }
 

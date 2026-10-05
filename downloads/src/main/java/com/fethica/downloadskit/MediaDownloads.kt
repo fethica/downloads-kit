@@ -331,7 +331,7 @@ public class MediaDownloads private constructor(
         dispatchToService { foreground ->
             DownloadService.sendResumeDownloads(
                 appContext,
-                MediaDownloadService::class.java,
+                config.serviceClass,
                 foreground,
             )
         }
@@ -382,19 +382,19 @@ public class MediaDownloads private constructor(
                 .setData(metadata.encode())
                 .build()
             dispatchToService { foreground ->
-                DownloadService.sendAddDownload(appContext, MediaDownloadService::class.java, request, foreground)
+                DownloadService.sendAddDownload(appContext, config.serviceClass, request, foreground)
             }
         }
 
         override fun remove(id: String) {
             dispatchToService { foreground ->
-                DownloadService.sendRemoveDownload(appContext, MediaDownloadService::class.java, id, foreground)
+                DownloadService.sendRemoveDownload(appContext, config.serviceClass, id, foreground)
             }
         }
 
         override fun removeAll() {
             dispatchToService { foreground ->
-                DownloadService.sendRemoveAllDownloads(appContext, MediaDownloadService::class.java, foreground)
+                DownloadService.sendRemoveAllDownloads(appContext, config.serviceClass, foreground)
             }
         }
 
