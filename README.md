@@ -141,7 +141,7 @@ All tests run on the JVM; the legacy-store compatibility tests use Robolectric. 
 
 ## Requirements
 
-- Android 7.0+ (API 24); compileSdk 36
+- Android 7.0+ (API 24); the library is built against compileSdk 36 with minor API level 1 (`release(36) { minorApiLevel = 1 }`), so a source or JitPack build needs the Android 36.1 platform; a consumer compiles against the published AAR with its own compileSdk 36 or later
 - Media3 1.9.2
 - Compose BOM 2026.01.01 (`downloads-compose` only)
 

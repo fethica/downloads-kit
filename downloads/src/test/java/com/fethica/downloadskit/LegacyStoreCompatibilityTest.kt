@@ -86,10 +86,12 @@ class LegacyStoreCompatibilityTest {
         val items = manifest.getJSONArray("items").let { array -> List(array.length()) { array.getJSONObject(it) } }
 
         val media = install()
-        // Nothing has been read back yet: unknown, not empty.
-        assertNull(media.indexedIds())
+        // The read-back runs on its own dispatcher and may or may not have finished by now:
+        // null means unknown, never empty, and a set that is already there is the complete one.
+        val expectedIds = items.map { it.getString("id") }.toSet()
+        media.indexedIds()?.let { assertEquals(expectedIds, it) }
 
-        assertEquals(items.map { it.getString("id") }.toSet(), await { media.indexedIds() })
+        assertEquals(expectedIds, await { media.indexedIds() })
         val entries = await { runBlocking { media.all().first() }.takeIf { it.size == items.size } }
 
         items.forEach { item ->
