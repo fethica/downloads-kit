@@ -104,7 +104,8 @@ Exactly one download service should be declared.
 
 ## What a host must know
 
-- **Storage names are yours and must never change silently.** `cacheDirName`, the preferences file and your own catalog name where downloads live on your users' phones. The library gives them no defaults because a wrong default strands every downloaded file without an error. Media3's database (`exoplayer_internal.db`) and the cache's `.uid` file live alongside; keep them together and exclude them from backups if you exclude the bytes.
+- **Storage names are yours and must never change silently.** `cacheDirName`, the preferences file and your own catalog name where downloads live on your users' phones. The library gives them no defaults because a wrong default strands every downloaded file without an error.
+- **Downloads live in two places.** The bytes and the cache's `.uid` file are under `filesDir/<cacheDirName>` (the `file` backup domain). The download index is Media3's database, `exoplayer_internal.db`, at `Context.getDatabasePath("exoplayer_internal.db")` (the `database` backup domain). The index, the `.uid` file and the bytes are kept or dropped together: a backup rule that excludes the cache directory must also exclude that database, or a restore brings back completed downloads with no bytes behind them. Apply the same rule to your own catalog if it records downloads.
 - **The Wi-Fi-only flag store.** With `preferencesName`, the flag lives in that SharedPreferences file under the key `wifi_only`, default `true`, read off the main thread. With `settings`, it lives wherever your `DownloadsSettings` keeps it.
 - **No resume on reboot from Android 12.** Media3 uses a scheduler below API 31 only, so on API 31 and later queued downloads do not resume by themselves after a reboot. They resume on the next app launch, which starts the download service.
 - **Foreground service type `dataSync`.** The library's manifest declares the service with `foregroundServiceType="dataSync"` and the `FOREGROUND_SERVICE_DATA_SYNC` and `POST_NOTIFICATIONS` permissions. On API 33 and later your app asks for the notification permission at runtime.
@@ -113,7 +114,7 @@ Exactly one download service should be declared.
 
 ## Sample app
 
-`sample` (application id `com.fethica.downloadskit.sample`) installs the library with its own storage names, channel, icon and notification id, and downloads three WAV files it generates itself from a loopback HTTP server inside the app. No network access beyond `127.0.0.1` is needed.
+`sample` (application id `com.fethica.downloadskit.sample`) installs the library with its own storage names, channel, icon and notification id, and downloads three WAV files it generates itself from a loopback HTTP server inside the app. Every fixture request stays on `127.0.0.1`, but the sample keeps the library's download requirements: a download only starts on a connected, validated network, and an unmetered one while Wi-Fi only is on (the default). In airplane mode, or on Wi-Fi without internet access, Start stays queued. Verify on an already completed item is the operation that works fully offline.
 
 | Fixture | Size | SHA-256 |
 | --- | --- | --- |
@@ -124,6 +125,8 @@ Exactly one download service should be declared.
 Each file is one second of a sine tone followed by silence, generated deterministically (see `FixtureCatalog`). The server supports GET, HEAD and single byte ranges. Debug builds add switches for a first-byte delay, slow chunks, a 404, a 500 and a mid-transfer cut. The Library tab shows the `downloads-compose` screen. The Diagnostics tab verifies each completed item by reading it back through `cacheDataSourceFactory` with an upstream that fails if it is ever opened, then comparing the SHA-256. There is no playback.
 
 Cleartext HTTP to `127.0.0.1` is allowed in the debug build only.
+
+The server reuses the previous launch's port so request URLs, and therefore cache keys, stay the same. When that port is taken, it binds another one and Diagnostics shows the change. Completed items still verify through the URL they were saved with, but unfinished downloads restored from the previous launch keep pointing at the old port: they fail or wait until Retry requests them again on the new one.
 
 ## Build and test
 
