@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Feature name, as it appears in a settings row or a library section. -->
+    <string name="downloads_offline_title">Listen offline</string>
+    <string name="downloads_offline_section">Offline</string>
+    <string name="downloads_offline_empty">Nothing downloaded yet</string>
+    <string name="downloads_offline_empty_hint">Downloaded items play without a connection.</string>
+    <string name="downloads_offline_ungrouped">Other</string>
+
+    <!-- Storage summary row. %1$s is a formatted size such as "8.4 MB". -->
+    <string name="downloads_offline_storage_used">%1$s used</string>
+    <!-- %1$d is a number of items, %2$s a formatted size. -->
+    <plurals name="downloads_offline_group_summary">
+        <item quantity="one">%1$d item · %2$s</item>
+        <item quantity="other">%1$d items · %2$s</item>
+    </plurals>
+
+    <string name="downloads_offline_wifi_only">Download over Wi-Fi only</string>
+    <string name="downloads_offline_clear_all">Clear all</string>
+    <string name="downloads_offline_clear_all_title">Remove all downloads?</string>
+    <!-- %1$s is a formatted size. -->
+    <string name="downloads_offline_clear_all_message">This frees %1$s. Your history and progress are not affected.</string>
+    <string name="downloads_offline_cancel">Cancel</string>
+    <string name="downloads_offline_confirm_remove">Remove</string>
+    <string name="downloads_offline_remove_item">Remove download</string>
+
+    <!-- The transfers strip at the top of the listing, and the group a tap opens. -->
+    <string name="downloads_offline_transfers">Downloading</string>
+    <string name="downloads_offline_retry">Retry</string>
+    <string name="downloads_offline_remove_group">Remove all</string>
+    <string name="downloads_offline_remove_group_title">Remove these downloads?</string>
+
+    <!-- Download button, one per state. -->
+    <string name="downloads_download_action_download">Download</string>
+    <string name="downloads_download_state_queued">Queued</string>
+    <!-- %1$d is a whole percentage. -->
+    <string name="downloads_download_state_downloading">Downloading, %1$d%%. Tap to stop.</string>
+    <string name="downloads_download_state_downloading_indeterminate">Downloading. Tap to stop.</string>
+    <string name="downloads_download_state_downloaded">Downloaded</string>
+    <string name="downloads_download_state_failed">Download failed. Tap to retry.</string>
+    <string name="downloads_download_state_removing">Removing</string>
+
+    <!-- Why a download failed. -->
+    <string name="downloads_download_failure_unknown">Download failed</string>
+    <string name="downloads_download_failure_network">No connection</string>
+    <string name="downloads_download_failure_http">Not available</string>
+    <string name="downloads_download_failure_storage_full">Storage full</string>
+
+    <!-- Size units. Kept short: they sit next to a number. -->
+    <string name="downloads_unit_bytes">B</string>
+    <string name="downloads_unit_kilobytes">KB</string>
+    <string name="downloads_unit_megabytes">MB</string>
+    <string name="downloads_unit_gigabytes">GB</string>
+</resources>

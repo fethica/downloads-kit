@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="downloads_offline_title">الاستماع دون اتصال</string>
+    <string name="downloads_offline_section">دون اتصال</string>
+    <string name="downloads_offline_empty">لا توجد تنزيلات بعد</string>
+    <string name="downloads_offline_empty_hint">تُشغَّل العناصر المنزَّلة دون اتصال بالإنترنت.</string>
+    <string name="downloads_offline_ungrouped">أخرى</string>
+
+    <string name="downloads_offline_storage_used">%1$s مستخدمة</string>
+    <plurals name="downloads_offline_group_summary">
+        <item quantity="zero">%1$d عنصر · %2$s</item>
+        <item quantity="one">عنصر واحد · %2$s</item>
+        <item quantity="two">عنصران · %2$s</item>
+        <item quantity="few">%1$d عناصر · %2$s</item>
+        <item quantity="many">%1$d عنصرًا · %2$s</item>
+        <item quantity="other">%1$d عنصر · %2$s</item>
+    </plurals>
+
+    <string name="downloads_offline_wifi_only">التنزيل عبر Wi-Fi فقط</string>
+    <string name="downloads_offline_clear_all">مسح الكل</string>
+    <string name="downloads_offline_clear_all_title">إزالة جميع التنزيلات؟</string>
+    <string name="downloads_offline_clear_all_message">سيُحرَّر %1$s. لن يتأثر سجلك ولا تقدُّمك.</string>
+    <string name="downloads_offline_cancel">إلغاء</string>
+    <string name="downloads_offline_confirm_remove">إزالة</string>
+    <string name="downloads_offline_remove_item">إزالة التنزيل</string>
+
+    <string name="downloads_offline_transfers">جارٍ التنزيل</string>
+    <string name="downloads_offline_retry">إعادة المحاولة</string>
+    <string name="downloads_offline_remove_group">إزالة الكل</string>
+    <string name="downloads_offline_remove_group_title">إزالة هذه التنزيلات؟</string>
+
+    <string name="downloads_download_action_download">تنزيل</string>
+    <string name="downloads_download_state_queued">في الانتظار</string>
+    <string name="downloads_download_state_downloading">جارٍ التنزيل، %1$d%%. اضغط للإيقاف.</string>
+    <string name="downloads_download_state_downloading_indeterminate">جارٍ التنزيل. اضغط للإيقاف.</string>
+    <string name="downloads_download_state_downloaded">تم التنزيل</string>
+    <string name="downloads_download_state_failed">فشل التنزيل. اضغط لإعادة المحاولة.</string>
+    <string name="downloads_download_state_removing">جارٍ الإزالة</string>
+
+    <string name="downloads_download_failure_unknown">فشل التنزيل</string>
+    <string name="downloads_download_failure_network">لا يوجد اتصال</string>
+    <string name="downloads_download_failure_http">غير متوفر</string>
+    <string name="downloads_download_failure_storage_full">مساحة التخزين ممتلئة</string>
+
+    <string name="downloads_unit_bytes">بايت</string>
+    <string name="downloads_unit_kilobytes">ك.ب</string>
+    <string name="downloads_unit_megabytes">م.ب</string>
+    <string name="downloads_unit_gigabytes">ج.ب</string>
+</resources>

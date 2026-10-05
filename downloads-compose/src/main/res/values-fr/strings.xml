@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="downloads_offline_title">Écouter hors ligne</string>
+    <string name="downloads_offline_section">Hors ligne</string>
+    <string name="downloads_offline_empty">Aucun téléchargement</string>
+    <string name="downloads_offline_empty_hint">Les éléments téléchargés se lisent sans connexion.</string>
+    <string name="downloads_offline_ungrouped">Autres</string>
+
+    <string name="downloads_offline_storage_used">%1$s utilisés</string>
+    <plurals name="downloads_offline_group_summary">
+        <item quantity="one">%1$d élément · %2$s</item>
+        <item quantity="many">%1$d éléments · %2$s</item>
+        <item quantity="other">%1$d éléments · %2$s</item>
+    </plurals>
+
+    <string name="downloads_offline_wifi_only">Télécharger en Wi-Fi uniquement</string>
+    <string name="downloads_offline_clear_all">Tout supprimer</string>
+    <string name="downloads_offline_clear_all_title">Supprimer tous les téléchargements ?</string>
+    <string name="downloads_offline_clear_all_message">Cela libère %1$s. Votre historique et votre progression ne sont pas touchés.</string>
+    <string name="downloads_offline_cancel">Annuler</string>
+    <string name="downloads_offline_confirm_remove">Supprimer</string>
+    <string name="downloads_offline_remove_item">Supprimer le téléchargement</string>
+
+    <string name="downloads_offline_transfers">Téléchargement en cours</string>
+    <string name="downloads_offline_retry">Réessayer</string>
+    <string name="downloads_offline_remove_group">Tout supprimer</string>
+    <string name="downloads_offline_remove_group_title">Supprimer ces téléchargements ?</string>
+
+    <string name="downloads_download_action_download">Télécharger</string>
+    <string name="downloads_download_state_queued">En attente</string>
+    <string name="downloads_download_state_downloading">Téléchargement, %1$d %%. Appuyez pour arrêter.</string>
+    <string name="downloads_download_state_downloading_indeterminate">Téléchargement. Appuyez pour arrêter.</string>
+    <string name="downloads_download_state_downloaded">Téléchargé</string>
+    <string name="downloads_download_state_failed">Échec du téléchargement. Appuyez pour réessayer.</string>
+    <string name="downloads_download_state_removing">Suppression</string>
+
+    <string name="downloads_download_failure_unknown">Échec du téléchargement</string>
+    <string name="downloads_download_failure_network">Pas de connexion</string>
+    <string name="downloads_download_failure_http">Non disponible</string>
+    <string name="downloads_download_failure_storage_full">Stockage plein</string>
+
+    <string name="downloads_unit_bytes">o</string>
+    <string name="downloads_unit_kilobytes">Ko</string>
+    <string name="downloads_unit_megabytes">Mo</string>
+    <string name="downloads_unit_gigabytes">Go</string>
+</resources>
