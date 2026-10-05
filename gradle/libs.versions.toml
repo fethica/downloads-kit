@@ -9,6 +9,9 @@ media3 = "1.9.2"
 coroutines = "1.9.0"
 annotation = "1.9.1"
 coroutinesTest = "1.10.2"
+# Tests only: Android framework on the JVM, for the stored-data compatibility tests.
+robolectric = "4.17"
+androidxTestCore = "1.7.0"
 # Sample app only.
 activityCompose = "1.12.4"
 
@@ -27,6 +30,8 @@ androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplaye
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidxTestCore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -20,6 +20,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     publishing { singleVariant("release") { withSourcesJar() } }
+    testOptions {
+        // Robolectric loads the merged resources, which declare the download service.
+        unitTests.isIncludeAndroidResources = true
+    }
     // No baseline: this module is clean, so lintDebug is a plain gate on it and
     // any error a change introduces fails the build straight away.
     kotlin {
@@ -42,6 +46,8 @@ dependencies {
     implementation(libs.androidx.annotation)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
 }
 
 group = property("GROUP") as String

@@ -1,0 +1,108 @@
+{
+  "format": 1,
+  "description": "A download store written by the previous version of this library, before its package moved. Bytes written with Media3 CacheWriter from in-memory payloads; no network.",
+  "media3": "1.9.2",
+  "database": {
+    "file": "databases/exoplayer_internal.db",
+    "downloadsTable": "ExoPlayerDownloads"
+  },
+  "cacheDir": "files/offline_downloads",
+  "cacheUidFile": "files/offline_downloads/5222ee944acd9b09.uid",
+  "metadataCodecVersion": 1,
+  "items": [
+    {
+      "id": "item-complete",
+      "uri": "https://example.invalid/media/complete.wav",
+      "mimeType": "audio/wav",
+      "state": "completed",
+      "stateCode": 3,
+      "title": "Item one",
+      "subtitle": "Part one",
+      "group": "group-a",
+      "artworkBytes": 32,
+      "contentLength": 65536,
+      "bytesDownloaded": 65536,
+      "payloadSeed": 1,
+      "sha256": "9174701c00904257b642f01e42968204db3b9ff6e5bcf8708f522c61ae67890d",
+      "cachedSha256": "9174701c00904257b642f01e42968204db3b9ff6e5bcf8708f522c61ae67890d"
+    },
+    {
+      "id": "item-partial",
+      "uri": "https://example.invalid/media/partial.wav",
+      "mimeType": "audio/wav",
+      "state": "queued",
+      "stateCode": 0,
+      "title": "Item two",
+      "subtitle": null,
+      "group": "group-a",
+      "artworkBytes": -1,
+      "contentLength": 98304,
+      "bytesDownloaded": 49152,
+      "payloadSeed": 2,
+      "sha256": "d4f51fce243392d1afa656b9a40ac0e2b067084d87709e87e0390a13054791ab",
+      "cachedSha256": "0fbb0df7ca85d5cfbfa848472e14be7b0820f3f0c5265a8321c5f35e9f4bab6a"
+    },
+    {
+      "id": "item-loose",
+      "uri": "https://example.invalid/media/loose.wav",
+      "mimeType": "audio/wav",
+      "state": "completed",
+      "stateCode": 3,
+      "title": "Item three",
+      "subtitle": null,
+      "group": null,
+      "artworkBytes": -1,
+      "contentLength": 32768,
+      "bytesDownloaded": 32768,
+      "payloadSeed": 3,
+      "sha256": "a36c6a39981e55108d51985f45109644976ff122c550b4699390e94fa2ce3068",
+      "cachedSha256": "a36c6a39981e55108d51985f45109644976ff122c550b4699390e94fa2ce3068"
+    }
+  ],
+  "preferences": {
+    "file": "shared_prefs/offline_downloads.xml",
+    "wifi_only": false
+  },
+  "catalog": {
+    "file": "shared_prefs/offline_prefs.xml",
+    "key": "offline_catalog",
+    "records": 3
+  },
+  "files": [
+    {
+      "path": "databases/exoplayer_internal.db",
+      "size": 40960,
+      "sha256": "6103b0c78d6c17f64940921a09814ce0b1410691b67ba77b92a76f59448de728"
+    },
+    {
+      "path": "files/offline_downloads/5/0.0.1791164744229.v3.exo",
+      "size": 65536,
+      "sha256": "9174701c00904257b642f01e42968204db3b9ff6e5bcf8708f522c61ae67890d"
+    },
+    {
+      "path": "files/offline_downloads/5222ee944acd9b09.uid",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "files/offline_downloads/9/1.0.1791164744237.v3.exo",
+      "size": 49152,
+      "sha256": "0fbb0df7ca85d5cfbfa848472e14be7b0820f3f0c5265a8321c5f35e9f4bab6a"
+    },
+    {
+      "path": "files/offline_downloads/9/2.0.1791164744239.v3.exo",
+      "size": 32768,
+      "sha256": "a36c6a39981e55108d51985f45109644976ff122c550b4699390e94fa2ce3068"
+    },
+    {
+      "path": "shared_prefs/offline_downloads.xml",
+      "size": 117,
+      "sha256": "b8b03c66496330c4eb1ee81bf26b212a0eda603d26aab17d0083efcfbba19ac0"
+    },
+    {
+      "path": "shared_prefs/offline_prefs.xml",
+      "size": 2063,
+      "sha256": "590fe1a928d4d60baeec7cb75b0c76f369ac4c1dc64c76f30924b9bb66bfc212"
+    }
+  ]
+}
