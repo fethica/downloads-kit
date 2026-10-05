@@ -66,7 +66,26 @@
   "catalog": {
     "file": "shared_prefs/offline_prefs.xml",
     "key": "offline_catalog",
-    "records": 3
+    "note": "A host-owned preferences file stored beside the downloads; the library must leave it byte-for-byte intact.",
+    "records": [
+      {
+        "id": "item-complete",
+        "title": "Item one",
+        "group": "group-a",
+        "added": 1704153600
+      },
+      {
+        "id": "item-partial",
+        "title": "Item two",
+        "group": "group-a",
+        "added": 1704240000
+      },
+      {
+        "id": "item-loose",
+        "title": "Item three",
+        "added": 1704326400
+      }
+    ]
   },
   "files": [
     {
@@ -101,8 +120,8 @@
     },
     {
       "path": "shared_prefs/offline_prefs.xml",
-      "size": 2063,
-      "sha256": "590fe1a928d4d60baeec7cb75b0c76f369ac4c1dc64c76f30924b9bb66bfc212"
+      "size": 523,
+      "sha256": "67d6ff6c12d1e3560d75e440dc16e6dbec35ab93ed14cf3de3201a30f26cc101"
     }
   ]
 }
