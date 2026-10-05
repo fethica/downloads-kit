@@ -44,7 +44,7 @@ internal fun DownloadSnapshot.toEntry(
     id = id,
     title = metadata.title,
     subtitle = metadata.subtitle,
-    group = metadata.group,
+    group = normalizeGroup(metadata.group),
     state = toDownloadState(failure),
     bytes = displayBytes(),
 )

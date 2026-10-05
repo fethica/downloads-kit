@@ -18,6 +18,12 @@ internal data class DownloadMetadata(
     val group: String?,
     val artwork: ByteArray? = null,
 ) {
+    /** This record with a blank group filed as no group; see [normalizeGroup]. */
+    fun withFiledGroup(): DownloadMetadata {
+        val filed = normalizeGroup(group)
+        return if (filed == group) this else copy(group = filed)
+    }
+
     fun encode(): ByteArray {
         val bytes = ByteArrayOutputStream()
         DataOutputStream(bytes).use { out ->

@@ -127,11 +127,11 @@ internal class DownloadsCore(
         .distinctUntilChanged()
 
     fun request(id: String, uri: String, mimeType: String?, metadata: DownloadMetadata) {
-        commands.add(id, uri, mimeType, metadata)
+        commands.add(id, uri, mimeType, metadata.withFiledGroup())
     }
 
     fun requestAll(items: List<DownloadCommand>) {
-        items.forEach { commands.add(it.id, it.uri, it.mimeType, it.metadata) }
+        items.forEach { commands.add(it.id, it.uri, it.mimeType, it.metadata.withFiledGroup()) }
     }
 
     fun remove(id: String) {
@@ -263,7 +263,7 @@ internal class DownloadsCore(
             // it, and the origin the host recorded on the retry tap was never consumed.
             val retried = previous?.snapshot?.state == Media3.STATE_FAILED && snapshot.isInFlight()
             if (previous == null || retried) {
-                events += { it.onStarted(snapshot.id, snapshot.metadata.group) }
+                events += { it.onStarted(snapshot.id, normalizeGroup(snapshot.metadata.group)) }
             }
             if (snapshot.state == Media3.STATE_COMPLETED && previous?.snapshot?.state != Media3.STATE_COMPLETED) {
                 events += { it.onCompleted(snapshot.id, snapshot.displayBytes(), snapshot.elapsedSeconds()) }

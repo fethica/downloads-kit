@@ -146,7 +146,11 @@ public class MediaDownloads private constructor(
 
     // ---------------------------------------------------------------- public API
 
-    /** Files one item. Safe to call again for an id already downloaded: media3 merges it. */
+    /**
+     * Files one item. Safe to call again for an id already downloaded: media3 merges it.
+     *
+     * @param group the host's group id; null or blank files the item under no group.
+     */
     public fun request(
         id: String,
         uri: Uri,
@@ -177,7 +181,7 @@ public class MediaDownloads private constructor(
         core.remove(id)
     }
 
-    /** Removes every item filed under [group]. */
+    /** Removes every item filed under [group]. A blank [group] names no group and removes nothing. */
     public fun removeGroup(group: String) {
         core.removeGroup(group)
     }
@@ -469,7 +473,7 @@ public class MediaDownloads private constructor(
     }
 }
 
-/** One item for [MediaDownloads.requestAll]. */
+/** One item for [MediaDownloads.requestAll]. A null or blank [group] files it under no group. */
 public class DownloadItem(
     public val id: String,
     public val uri: Uri,

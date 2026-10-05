@@ -220,6 +220,49 @@ class DownloadsCoreTest {
     }
 
     @Test
+    fun `a blank group is filed as no group by request and requestAll`() = runTest {
+        val core = core()
+        core.request("e1", "https://x/1.mp3", null, DownloadMetadata("Item 1", null, ""))
+        core.requestAll(listOf(DownloadCommand("e2", "https://x/2.mp3", null, DownloadMetadata("Item 2", null, "  "))))
+        assertEquals(listOf(null, null), commands.added.map { it.third.group })
+    }
+
+    @Test
+    fun `an entry restored with a blank group joins the loose bucket`() = runTest {
+        val core = core()
+        core.onIndexLoaded(
+            listOf(
+                snapshotOf("empty", Media3.STATE_COMPLETED, group = ""),
+                snapshotOf("loose", Media3.STATE_COMPLETED),
+                snapshotOf("a", Media3.STATE_COMPLETED, group = "group:1"),
+            ),
+        )
+        assertEquals(listOf(null, null, "group:1"), core.entries.value.map { it.group })
+        val groups = groupDownloads(core.entries.value)
+        assertEquals(listOf("empty", "loose"), groups.findByKey(UNGROUPED_KEY)?.entries?.map { it.id })
+    }
+
+    @Test
+    fun `a blank group reports its start as ungrouped`() = runTest {
+        val core = core()
+        core.onDownloadChanged(snapshotOf("e1", Media3.STATE_QUEUED, group = ""), null)
+        assertEquals(listOf("started:e1:null"), listener.events)
+    }
+
+    @Test
+    fun `removing a blank group removes nothing`() = runTest {
+        val core = core()
+        core.onIndexLoaded(
+            listOf(
+                snapshotOf("empty", Media3.STATE_COMPLETED, group = ""),
+                snapshotOf("loose", Media3.STATE_COMPLETED),
+            ),
+        )
+        core.removeGroup("")
+        assertEquals(emptyList<String>(), commands.removed)
+    }
+
+    @Test
     fun `clearing all reports the count and the bytes before asking the manager to wipe`() = runTest {
         val core = core()
         core.onIndexLoaded(

@@ -14,15 +14,15 @@ public data class DownloadGroup(
 
 /**
  * Gathers entries by [DownloadEntry.group], preserving the order the groups first
- * appear in and the order of entries inside each one. Ungrouped entries collect into a
- * single trailing group keyed null.
+ * appear in and the order of entries inside each one. Ungrouped entries, including
+ * those with a blank group, collect into a single trailing group keyed null.
  */
 public fun groupDownloads(entries: List<DownloadEntry>): List<DownloadGroup> {
     if (entries.isEmpty()) return emptyList()
     val grouped = LinkedHashMap<String, MutableList<DownloadEntry>>()
     val loose = mutableListOf<DownloadEntry>()
     for (entry in entries) {
-        val key = entry.group
+        val key = normalizeGroup(entry.group)
         if (key == null) loose += entry else grouped.getOrPut(key) { mutableListOf() } += entry
     }
     val groups = grouped.map { (key, items) -> DownloadGroup(key, items, totalBytes(items)) }
@@ -36,16 +36,33 @@ public fun groupDownloads(entries: List<DownloadEntry>): List<DownloadGroup> {
 public fun totalBytes(entries: List<DownloadEntry>): Long =
     entries.sumOf { if (it.state is DownloadState.Removing) 0L else it.bytes }
 
-/** The ids filed under [group], in order — what a "remove this whole group" action needs. */
-public fun idsInGroup(entries: List<DownloadEntry>, group: String): List<String> =
-    entries.filter { it.group == group }.map { it.id }
+/**
+ * The ids filed under [group], in order — what a "remove this whole group" action needs.
+ *
+ * A blank [group] names no group, so it matches nothing: the loose bucket is not a group
+ * and is never removed as one.
+ */
+public fun idsInGroup(entries: List<DownloadEntry>, group: String): List<String> {
+    val wanted = normalizeGroup(group) ?: return emptyList()
+    return entries.filter { normalizeGroup(it.group) == wanted }.map { it.id }
+}
+
+/**
+ * A group id as it is filed: null for no group, and null for a blank one too.
+ *
+ * Applied wherever a group enters the library (a request, an entry restored from the
+ * index, a host-built entry being grouped), so `""` can never stand for a real group and
+ * [UNGROUPED_KEY] always means the loose bucket.
+ */
+internal fun normalizeGroup(group: String?): String? = group?.takeUnless { it.isBlank() }
 
 /**
  * The key the loose bucket is addressed by.
  *
  * A two-level listing has to be able to name the level it is on with one value, and
  * `null` is already taken: it is what "show the list of groups" means. The empty string
- * cannot collide with a real group, because a blank group is filed as no group at all.
+ * cannot collide with a real group, because a blank group is filed as no group at all:
+ * requests, restored entries and [groupDownloads] all treat it as null.
  */
 public const val UNGROUPED_KEY: String = ""
 

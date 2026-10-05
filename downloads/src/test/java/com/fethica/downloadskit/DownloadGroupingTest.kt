@@ -163,4 +163,44 @@ class DownloadGroupingTest {
         val groups = groupDownloads(listOf(entry("a", "group:1", state = DownloadState.Queued)))
         assertEquals(listOf("group:1"), groups.map { it.id })
     }
+    // --- blank group ids -----------------------------------------------------
+
+    @Test
+    fun `a blank group is the loose bucket, not a group of its own`() {
+        val groups = groupDownloads(
+            listOf(entry("empty", ""), entry("a", "group:1"), entry("loose"), entry("spaces", "  ")),
+        )
+        assertEquals(listOf("group:1", null), groups.map { it.id })
+        assertEquals(listOf("empty", "loose", "spaces"), groups.last().entries.map { it.id })
+    }
+
+    @Test
+    fun `no two groups share a key when blank and missing groups are mixed`() {
+        val groups = groupDownloads(listOf(entry("empty", ""), entry("loose"), entry("a", "group:1")))
+        assertEquals(groups.size, groups.map { it.key }.toSet().size)
+    }
+
+    @Test
+    fun `the ungrouped key finds every loose entry, whether its group was missing or blank`() {
+        val groups = groupDownloads(listOf(entry("empty", ""), entry("loose")))
+        val loose = groups.findByKey(UNGROUPED_KEY)
+        assertEquals(null, loose?.id)
+        assertEquals(listOf("empty", "loose"), loose?.entries?.map { it.id })
+    }
+
+    @Test
+    fun `a blank group names nothing to remove`() {
+        val entries = listOf(entry("empty", ""), entry("loose"), entry("a", "group:1"))
+        assertEquals(emptyList<String>(), idsInGroup(entries, ""))
+        assertEquals(emptyList<String>(), idsInGroup(entries, " "))
+        assertEquals(listOf("a"), idsInGroup(entries, "group:1"))
+    }
+
+    @Test
+    fun `a blank group is filed as no group`() {
+        assertEquals(null, normalizeGroup(""))
+        assertEquals(null, normalizeGroup(" \t"))
+        assertEquals(null, normalizeGroup(null))
+        assertEquals("group:1", normalizeGroup("group:1"))
+    }
 }
