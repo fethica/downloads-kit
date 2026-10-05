@@ -16,7 +16,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -42,6 +41,17 @@ internal class SampleController(
     private val _port = MutableStateFlow(-1)
     val port: StateFlow<Int> = _port.asStateFlow()
 
+    /**
+     * The port of the previous launch when this launch could not get it back, else null.
+     *
+     * Unfinished downloads restored from the index still point at that old port: the
+     * request URL is the cache key, and the sample does not rewrite it. They fail or wait
+     * until Retry requests them again on the current port. Completed items are unaffected,
+     * because they are read from the cache under the URL they were saved with.
+     */
+    private val _previousPort = MutableStateFlow<Int?>(null)
+    val previousPort: StateFlow<Int?> = _previousPort.asStateFlow()
+
     private val _scenarios = MutableStateFlow<Map<String, Scenario>>(emptyMap())
     val scenarios: StateFlow<Map<String, Scenario>> = _scenarios.asStateFlow()
 
@@ -49,20 +59,24 @@ internal class SampleController(
     private val _generatedSha = MutableStateFlow<Map<String, String>>(emptyMap())
     val generatedSha: StateFlow<Map<String, String>> = _generatedSha.asStateFlow()
 
-    private val _verifications = MutableStateFlow<Map<String, Verification>>(emptyMap())
-    val verifications: StateFlow<Map<String, Verification>> = _verifications.asStateFlow()
+    /** Results that still describe the download on disk; see [VerificationLedger]. */
+    private val ledger = VerificationLedger<Verdict>()
+    private val _verifications = MutableStateFlow<Map<String, VerificationLedger.Status<Verdict>>>(emptyMap())
+    val verifications: StateFlow<Map<String, VerificationLedger.Status<Verdict>>> = _verifications.asStateFlow()
 
-    sealed interface Verification {
-        data object Running : Verification
-        data class Done(val result: CacheProof.Result, val matchesFixture: Boolean) : Verification
-    }
+    data class Verdict(val result: CacheProof.Result, val matchesFixture: Boolean)
 
     fun start() {
         // Binding a loopback socket is quick; the fixture bytes are generated lazily, on
         // the first request or below on a background dispatcher.
         scope.launch(Dispatchers.IO) {
-            val bound = server.start(preferredPort = prefs.getInt(KEY_PORT, 0))
+            val preferred = prefs.getInt(KEY_PORT, 0)
+            val bound = server.start(preferredPort = preferred)
             prefs.edit().putInt(KEY_PORT, bound).apply()
+            if (preferred != 0 && bound != preferred) {
+                _previousPort.value = preferred
+                SampleLog.event("server", "endpoint_changed", "from=127.0.0.1:$preferred to=127.0.0.1:$bound")
+            }
             _port.value = bound
             SampleLog.event("server", "listening", "host=127.0.0.1:$bound")
         }
@@ -90,13 +104,19 @@ internal class SampleController(
             for (entry in entries) {
                 seen += entry.id
                 val label = stateLabel(entry.state, bucketed = true)
-                if (last[entry.id] != label) {
+                val previous = last[entry.id]
+                if (previous != label) {
+                    // Whatever moved a download off "downloaded" (a removal from the
+                    // Library tab, a re-request) leaves any earlier check describing
+                    // bytes that are no longer the ones on disk.
+                    if (previous == LABEL_DOWNLOADED) invalidateVerification(entry.id)
                     last[entry.id] = label
                     SampleLog.event(entry.id, label, "bytes=${entry.bytes}")
                 }
             }
             (last.keys - seen).forEach {
                 last.remove(it)
+                invalidateVerification(it)
                 SampleLog.event(it, "not_downloaded")
             }
         }
@@ -121,6 +141,7 @@ internal class SampleController(
             return
         }
         val url = server.urlFor(fixture)
+        invalidateVerification(fixture.name)
         prefs.edit().putString(KEY_URL_PREFIX + fixture.name, url).apply()
         downloads.request(
             id = fixture.name,
@@ -145,16 +166,20 @@ internal class SampleController(
 
     fun remove(id: String) {
         SampleLog.event(id, "remove_requested")
+        invalidateVerification(id)
         downloads.remove(id)
     }
 
     fun removeGroup(group: String) {
         SampleLog.event("group:$group", "remove_group_requested")
+        fixtures.filter { groupOf(it) == group }.forEach { invalidateVerification(it.name) }
         downloads.removeGroup(group)
     }
 
     fun clearAll() {
         SampleLog.event("*", "clear_all_requested")
+        ledger.invalidateAll()
+        publishVerifications()
         downloads.clearAll()
     }
 
@@ -170,22 +195,43 @@ internal class SampleController(
         prefs.getString(KEY_URL_PREFIX + fixture.name, null)
             ?: server.takeIf { it.isRunning }?.urlFor(fixture)
 
+    /**
+     * Reads [fixture] back through the cache and records the verdict, unless the download
+     * is requested again, removed or cleared while the read runs: then the verdict is
+     * logged as stale and never shown.
+     */
     fun verify(fixture: WavFixture) {
         val key = cacheKey(fixture) ?: return
-        _verifications.update { it + (fixture.name to Verification.Running) }
+        val ticket = ledger.begin(fixture.name, key)
+        publishVerifications()
         scope.launch {
             val result = withContext(Dispatchers.IO) {
                 CacheProof.verify(downloads, key, fixture.sizeBytes.toLong())
             }
             val matches = result.servedFromCacheOnly && result.sha256 == fixture.sha256
-            _verifications.update { it + (fixture.name to Verification.Done(result, matches)) }
+            val kept = ledger.finish(ticket, Verdict(result, matches))
+            publishVerifications()
             SampleLog.event(
                 fixture.name,
-                if (matches) "verify_pass" else "verify_fail",
+                when {
+                    !kept -> "verify_stale"
+                    matches -> "verify_pass"
+                    else -> "verify_fail"
+                },
                 "bytes=${result.bytesRead} cached=${result.cachedBytesBefore} upstream_opens=${result.upstreamOpens} " +
                     "sha_match=${result.sha256 == fixture.sha256}" + (result.error?.let { " error=$it" } ?: ""),
             )
         }
+    }
+
+    /** Snapshot and publish under one lock, so a slower thread never publishes an older map. */
+    private fun publishVerifications() {
+        synchronized(ledger) { _verifications.value = ledger.snapshot() }
+    }
+
+    private fun invalidateVerification(id: String) {
+        ledger.invalidate(id)
+        publishVerifications()
     }
 
     // ---------------------------------------------------------------- scenarios
@@ -222,6 +268,7 @@ internal class SampleController(
         private const val KEY_PORT = "server_port"
         private const val KEY_URL_PREFIX = "url_"
         private const val MIME_WAV = "audio/wav"
+        private const val LABEL_DOWNLOADED = "downloaded"
 
         fun describe(scenario: Scenario): String = if (scenario.isDefault) {
             "normal"
@@ -242,7 +289,7 @@ internal class SampleController(
                 bucketed -> "downloading_${(state.progress * 4).toInt().coerceIn(0, 3) * 25}pct"
                 else -> "downloading_${(state.progress * 100).toInt()}pct"
             }
-            is DownloadState.Downloaded -> "downloaded"
+            is DownloadState.Downloaded -> LABEL_DOWNLOADED
             is DownloadState.Failed -> "failed_${state.reason.key}"
             DownloadState.Removing -> "removing"
         }

@@ -92,6 +92,51 @@ class FixtureServerTest {
     }
 
     @Test
+    fun headIgnoresASatisfiableRange() {
+        val fixture = FixtureCatalog.large
+        val response = request("HEAD", fixture.path, "Range" to "bytes=0-9")
+        assertEquals(200, response.status)
+        assertEquals(fixture.sizeBytes.toString(), response.headers["content-length"])
+        assertEquals(null, response.headers["content-range"])
+        assertEquals(0, response.body.size)
+    }
+
+    @Test
+    fun headIgnoresAnUnsatisfiableRange() {
+        val fixture = FixtureCatalog.small
+        val response = request("HEAD", fixture.path, "Range" to "bytes=${fixture.sizeBytes}-")
+        assertEquals(200, response.status)
+        assertEquals(fixture.sizeBytes.toString(), response.headers["content-length"])
+        assertEquals(null, response.headers["content-range"])
+        assertEquals(0, response.body.size)
+    }
+
+    @Test
+    fun startReusesAFreePreferredPort() {
+        val port = server.port
+        server.close()
+        val again = FixtureServer()
+        try {
+            assertEquals(port, again.start(preferredPort = port))
+        } finally {
+            again.close()
+        }
+    }
+
+    @Test
+    fun startFallsBackToAnotherPortWhenThePreferredOneIsBusy() {
+        val other = FixtureServer()
+        try {
+            val bound = other.start(preferredPort = server.port)
+            assertTrue(bound in 1..65_535)
+            assertTrue(bound != server.port)
+            assertEquals(200, request("HEAD", FixtureCatalog.small.path).status)
+        } finally {
+            other.close()
+        }
+    }
+
+    @Test
     fun cutAfterBytesClosesEarly() {
         val fixture = FixtureCatalog.medium
         server.setScenario(fixture, Scenario(cutAfterBytes = 10_000))

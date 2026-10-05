@@ -176,7 +176,9 @@ public class FixtureServer(
         val body = fixture.cached
         val size = body.size.toLong()
         val common = listOf("Content-Type" to CONTENT_TYPE, "Accept-Ranges" to "bytes")
-        val range = request.headers["range"]?.let { parseRange(it, size) }
+        // Range applies to GET only; any other method ignores it and describes the whole
+        // representation (RFC 9110, section 14.2). HEAD therefore answers as a full GET.
+        val range = if (request.method == "GET") request.headers["range"]?.let { parseRange(it, size) } else null
         val (start, endInclusive) = when (range) {
             null, RangeResult.Ignore -> {
                 writeHead(out, 200, "OK", common + ("Content-Length" to size.toString()))
