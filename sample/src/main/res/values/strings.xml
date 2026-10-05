@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The sample is English only; the libraries it shows keep their French and Arabic. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="app_name">Downloads sample</string>
+    <string name="notification_channel_name">Sample downloads</string>
+    <string name="notification_channel_description">Progress of the sample\'s fixture downloads</string>
+</resources>
