@@ -105,8 +105,8 @@ public fun OfflineScreen(
     onClearAll: () -> Unit,
     onToggleWifiOnly: (Boolean) -> Unit,
     onOpen: (DownloadEntry) -> Unit,
-    onRetry: (DownloadEntry) -> Unit = {},
     modifier: Modifier = Modifier,
+    onRetry: (DownloadEntry) -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(0.dp),
     groupTitle: (String) -> String = { it },
     artwork: DownloadArtwork = { _, tile -> DownloadArtworkPlaceholder(tile) },
@@ -176,7 +176,7 @@ private fun GroupsLibrary(
     val transfers = remember(downloads) { activeTransfers(downloads) }
 
     LazyColumn(modifier = modifier.fillMaxSize(), contentPadding = contentPadding) {
-        item(key = "summary") {
+        item(key = OfflineRowKeys.SUMMARY) {
             SummaryRow(
                 storageUsed = storageUsed,
                 itemCount = downloads.size,
@@ -190,13 +190,13 @@ private fun GroupsLibrary(
         // of groups. Filed away under its group it would be invisible, which for the one kind of
         // row a person is actively waiting on is the wrong way round.
         if (transfers.isNotEmpty()) {
-            item(key = "transfers-header") { TransfersLabel() }
+            item(key = OfflineRowKeys.TRANSFERS_LABEL) { TransfersLabel() }
             items(
                 items = transfers,
                 // The download id survives every progress tick, so a queue for a
                 // whole large group recomposes the one row that moved instead of
                 // composing every row inside a single list item.
-                key = { "transfer-" + it.id },
+                key = { OfflineRowKeys.transfer(it.id) },
             ) { entry ->
                 TransferGround(isLast = entry.id == transfers.last().id) {
                     TransferRow(entry = entry, onRemove = { onRemove(entry.id) }, onRetry = { onRetry(entry) })
@@ -205,10 +205,11 @@ private fun GroupsLibrary(
         }
 
         if (groups.isEmpty()) {
-            item(key = "empty") { EmptyState() }
+            item(key = OfflineRowKeys.EMPTY) { EmptyState() }
         }
 
-        items(groups, key = { it.key }) { group ->
+        // The row key is namespaced; the value handed to onOpenGroup is the group's own key.
+        items(groups, key = { OfflineRowKeys.group(it) }) { group ->
             GroupRow(
                 group = group,
                 title = group.id?.let(groupTitle)
@@ -385,7 +386,7 @@ private fun GroupDownloads(
     var confirmingRemoveAll by remember { mutableStateOf(false) }
 
     LazyColumn(modifier = modifier.fillMaxSize(), contentPadding = contentPadding) {
-        item(key = "header") {
+        item(key = OfflineRowKeys.GROUP_HEADER) {
             GroupHeader(
                 group = group,
                 title = title,
@@ -397,7 +398,7 @@ private fun GroupDownloads(
             )
             HorizontalDivider()
         }
-        items(group.entries, key = { it.id }) { entry ->
+        items(group.entries, key = { OfflineRowKeys.item(it.id) }) { entry ->
             ItemRow(
                 entry = entry,
                 group = group.id,
