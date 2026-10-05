@@ -137,11 +137,11 @@ You need the Android SDK (`local.properties` with `sdk.dir`, or `ANDROID_HOME`) 
 ./gradlew :downloads:assembleRelease :downloads-compose:assembleRelease :sample:assembleDebug
 ```
 
-All tests are plain JVM tests, with no Robolectric and no device.
+All tests run on the JVM; the legacy-store compatibility tests use Robolectric. No device is needed.
 
 ## Requirements
 
-- Android 7.0+ (API 24)
+- Android 7.0+ (API 24); compileSdk 36
 - Media3 1.9.2
 - Compose BOM 2026.01.01 (`downloads-compose` only)
 
